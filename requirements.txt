@@ -1,0 +1,4 @@
+Flask==2.1.2
+requests==2.28.1
+emailjs-python==0.0.3   # Optional if using EmailJS for email sending
+python-dotenv==0.21.0
