@@ -98,7 +98,7 @@ def check_price(stock, epic, purchase_price):
         print(f"Current price of {epic}: {current_price}")
         price_drop = ((purchase_price - current_price) / purchase_price) * 100
         
-        if price_drop <= 10:
+        if price_drop >= 10:
             email_log = load_email_log()
             if not email_already_sent_today(email_log, epic):
                 print(f"Price of {epic} has dropped by {price_drop:.2f}%! Sending alert email...")
@@ -106,7 +106,7 @@ def check_price(stock, epic, purchase_price):
 
                 if epic not in email_log:
                     email_log[epic] = []
-                email_log[epic].append({'date': str(datetime.date.today()), 'time': str(datetime.datetime.now().time())})
+                email_log[epic].append({'date': str(datetime.date.today()), 'time': str(datetime.datetime.now().time()), 'current_price': current_price})
                 save_email_log(email_log)
             else:
                 print(f"Email alert for {stock} has already been sent today.")
@@ -131,10 +131,12 @@ def save_email_log(log):
 # Function to check if an email was already sent today for a specific stock
 def email_already_sent_today(log, epic):
     today = str(datetime.date.today())
-    # Check if there is any entry for the stock for today
-    if epic in log:
-        return any(entry['date'] == today for entry in log[epic])
+    # Check if epic exists in log and contains a list of date entries
+    if epic in log and isinstance(log[epic], list):
+        # Check if any entry for today exists in the list
+        return any(entry['date'] == today for entry in log[epic] if 'date' in entry)
     return False
+
 
 # Function to monitor the stock
 def monitor_stock(stock, epic, purchase_price):
